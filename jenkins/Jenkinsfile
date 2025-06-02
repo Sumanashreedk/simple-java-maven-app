@@ -1,5 +1,13 @@
 pipeline {
     agent any
+      tools {
+        maven 'Maven_3.9.9'  // This must match the Maven name in Jenkins -> Global Tool Configuration
+        jdk 'JDK_21'         // Optional: use this if you're managing JDK via Jenkins
+    }
+
+    environment {
+        PATH = "${tool 'Maven_3.9.9'}/bin:${env.PATH}"
+    }
     options {
         skipStagesAfterUnstable()
     }
