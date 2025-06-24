@@ -1,5 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mycompany.app</groupId>
   <artifactId>my-app</artifactId>
@@ -7,33 +9,65 @@
   <version>1.0-SNAPSHOT</version>
   <name>my-app</name>
   <url>https://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>21</maven.compiler.release>
+    <junit.version>5.12.2</junit.version>
+    <jacoco.version>0.8.11</jacoco.version>
+  </properties>
+
   <dependencies>
+    <!-- JUnit 5 for testing -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <version>5.12.2</version>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+
   <build>
     <pluginManagement>
       <plugins>
+        <!-- Enforcer plugin to require Java 21 and Maven 3.9.9+ -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.14.0</version>
-          <configuration>
-            <release>17</release>
-          </configuration>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <version>3.5.0</version>
+          <executions>
+            <execution>
+              <id>enforce-maven</id>
+              <goals><goal>enforce</goal></goals>
+              <configuration>
+                <rules>
+                  <requireMavenVersion>
+                    <version>[3.9.9,)</version>
+                  </requireMavenVersion>
+                  <requireJavaVersion>
+                    <version>[21,)</version>
+                  </requireJavaVersion>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
+
     <plugins>
+      <!-- Compiler Plugin -->
       <plugin>
-        <!-- Build an executable JAR -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.14.0</version>
+        <configuration>
+          <release>${maven.compiler.release}</release>
+        </configuration>
+      </plugin>
+
+      <!-- Jar Plugin -->
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>3.4.2</version>
@@ -47,29 +81,37 @@
           </archive>
         </configuration>
       </plugin>
+
+      <!-- Surefire Plugin for test execution and reports -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>3.5.0</version>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.1.2</version>
+        <configuration>
+          <useSystemClassLoader>true</useSystemClassLoader>
+        </configuration>
+      </plugin>
+
+      <!-- JaCoCo Plugin for test coverage reports -->
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>${jacoco.version}</version>
         <executions>
+          <!-- Prepare agent before tests -->
           <execution>
-            <id>enforce-maven</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireMavenVersion>
-                  <version>[3.9.9,)</version>
-                </requireMavenVersion>
-                <requireJavaVersion>
-                  <version>[21,)</version>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
+            <id>prepare-agent</id>
+            <goals><goal>prepare-agent</goal></goals>
+          </execution>
+          <!-- Generate report after tests -->
+          <execution>
+            <id>report</id>
+            <phase>verify</phase>
+            <goals><goal>report</goal></goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>
+
 </project>
